@@ -1,84 +1,51 @@
+
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import current_user, login_required
+from datetime import datetime
 
 from . import main
-from .forms import NameForm
-
-from app.models import (
-    User,
-    inicializar_banco,
-    carregar_emails,
-    carregar_usuarios,
-    adicionar_usuario,
-    editar_usuario,
-    excluir_usuario
-)
-
-from app.email import send_email
-
-inicializar_banco()
+from .forms import DisciplinaForm
+from app import db
+from app.models import Disciplina
 
 
-@main.route('/', methods=['GET', 'POST'])
+@main.route('/')
 def index():
-    form = NameForm()
+    data_hora = datetime.now().strftime(
+        '%B %d, %Y %I:%M %p'
+    )
 
-    if current_user.is_authenticated and form.validate_on_submit():
-        nome = form.name.data
-        novo_usuario = adicionar_usuario(nome)
-
-        if novo_usuario:
-            send_email(
-                subject='Novo usuário',
-                new_username=nome,
-                additional_email=form.email.data
-            )
-            flash('Usuário cadastrado e e-mails enviados com sucesso.', 'success')
-        else:
-            flash('Esse usuário já está cadastrado.', 'warning')
-
-        return redirect(url_for('main.index'))
-
-    if current_user.is_authenticated and current_user.confirmed:
-        usuarios = User.query.order_by(User.id).all()
-    else:
-        usuarios = []
+    pagina = request.args.get('pagina')
 
     return render_template(
         'index.html',
-        form=form if current_user.is_authenticated else None,
-        usuarios=usuarios
+        data_hora=data_hora,
+        pagina=pagina
     )
 
 
-@main.route('/emailsEnviados')
-@login_required
-def emails_enviados():
-    emails = carregar_emails()
-    return render_template('emailsEnviados.html', emails=emails)
+@main.route('/disciplinas', methods=['GET', 'POST'])
+def disciplinas():
+    form = DisciplinaForm()
 
+    if form.validate_on_submit():
+        disciplina = Disciplina(
+            nome=form.nome.data,
+            semestre=form.semestre.data
+        )
 
-@main.route('/editar/<nome>', methods=['POST'])
-@login_required
-def editar(nome):
-    novo_nome = request.form.get('novo_nome', '').strip()
+        db.session.add(disciplina)
+        db.session.commit()
 
-    if not novo_nome:
-        flash('O nome não pode ficar vazio.', 'danger')
-    elif editar_usuario(nome, novo_nome):
-        flash('Usuário editado com sucesso.', 'success')
-    else:
-        flash('Não foi possível editar. Verifique o nome ou as permissões.', 'danger')
+        flash('Disciplina cadastrada com sucesso!')
 
-    return redirect(url_for('main.index'))
+        return redirect(url_for('main.disciplinas'))
 
+    disciplinas = Disciplina.query.order_by(
+        Disciplina.id
+    ).all()
 
-@main.route('/excluir/<nome>', methods=['POST'])
-@login_required
-def excluir(nome):
-    if excluir_usuario(nome):
-        flash('Usuário excluído com sucesso.', 'success')
-    else:
-        flash('Não foi possível excluir esse usuário.', 'danger')
-
-    return redirect(url_for('main.index'))
+    return render_template(
+        'disciplinas.html',
+        form=form,
+        disciplinas=disciplinas
+    )

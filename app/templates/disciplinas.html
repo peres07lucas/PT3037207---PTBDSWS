@@ -1,0 +1,65 @@
+
+{% extends "base.html" %}
+
+{% block page_content %}
+<h1>Cadastro de Disciplinas</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+        {{ form.nome.label }}
+        {{ form.nome(class="form-control") }}
+
+        {% for erro in form.nome.errors %}
+            <span class="text-danger">{{ erro }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form.semestre.label }}
+
+        <div>
+    {% for escolha in form.semestre %}
+        <div>
+            <label style="font-weight: normal;">
+                {{ escolha }}
+                {{ escolha.label.text }}
+            </label>
+        </div>
+    {% endfor %}
+    </div>
+
+        {% for erro in form.semestre.errors %}
+            <span class="text-danger">{{ erro }}</span>
+        {% endfor %}
+    </div>
+
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+
+<hr>
+
+<h2>Disciplinas cadastradas</h2>
+
+{% if disciplinas %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Semestre</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for disciplina in disciplinas %}
+                <tr>
+                    <td>{{ disciplina.nome }}</td>
+                    <td>{{ disciplina.semestre }}º semestre</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Nenhuma disciplina cadastrada.</p>
+{% endif %}
+{% endblock %}

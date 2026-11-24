@@ -1,68 +1,19 @@
-{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}Flasky{% endblock %}
+{% extends "base.html" %}
 
 {% block page_content %}
 
-<div class="page-header">
-    <h1>
-        {% if current_user.is_authenticated %}
-            Olá, {{ current_user.username }}!
-        {% else %}
-            Olá, Estranho!
-        {% endif %}
-    </h1>
-</div>
+{% if pagina %}
+    <h1>Não disponível</h1>
+    <p>A data e hora local é {{ data_hora }}.</p>
+{% else %}
+    <div class="page-header">
+        <h1>Avaliação semestral</h1>
+        <h3>Aluno: Lucas Peres Gomes</h3>
+        <h3>Prontuário: PT3037207</h3>
+    </div>
 
-{% if current_user.is_authenticated %}
-
-    {{ wtf.quick_form(form) }}
-
-    <hr>
-
-    <h2>Relação de usuários cadastrados</h2>
-
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nome de usuário</th>
-                <th>E-mail</th>
-                <th>Confirmado?</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td>{{ usuario.username }}</td>
-                <td>{{ usuario.email }}</td>
-                <td>
-                    {% if usuario.confirmed %}
-                        Sim
-                    {% else %}
-                        Não
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <script>
-    function editarLinha(id) {
-        document.getElementById('nome-' + id).style.display = 'none';
-        document.getElementById('form-editar-' + id).style.display = 'block';
-        document.getElementById('botao-editar-' + id).style.display = 'none';
-    }
-
-    function cancelarEdicao(id) {
-        document.getElementById('nome-' + id).style.display = 'inline';
-        document.getElementById('form-editar-' + id).style.display = 'none';
-        document.getElementById('botao-editar-' + id).style.display = 'inline-block';
-    }
-    </script>
-
+    <p>A data e hora local é {{ data_hora }}.</p>
 {% endif %}
 
 {% endblock %}

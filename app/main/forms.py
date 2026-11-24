@@ -1,24 +1,31 @@
+
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, Length, Email
+from wtforms import StringField, RadioField, SubmitField
+from wtforms.validators import DataRequired, Length
 
 
-class NameForm(FlaskForm):
+class DisciplinaForm(FlaskForm):
 
-    name = StringField(
-        'Qual é o seu nome?',
+    nome = StringField(
+        'Nome da disciplina',
         validators=[
             DataRequired(),
-            Length(1, 64)
+            Length(1, 100)
         ]
     )
 
-    email = StringField(
-        'Qual é o seu email (Envio de notificação do novo usuário)?',
-        validators=[
-            DataRequired(),
-            Email()
-        ]
+    semestre = RadioField(
+        'Semestre',
+        choices=[
+            (1, '1º semestre'),
+            (2, '2º semestre'),
+            (3, '3º semestre'),
+            (4, '4º semestre'),
+            (5, '5º semestre'),
+            (6, '6º semestre')
+        ],
+        coerce=int,
+        validators=[DataRequired()]
     )
 
-    submit = SubmitField('Submit')
+    submit = SubmitField('Cadastrar')
